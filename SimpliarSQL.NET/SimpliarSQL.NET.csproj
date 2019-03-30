@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Encryption\Hash.cs" />
     <Compile Include="Core\MySQL\Execute.cs" />
     <Compile Include="Core\MySQL\FetchAll.cs" />
     <Compile Include="Core\MySQL\FetchScalar.cs" />
