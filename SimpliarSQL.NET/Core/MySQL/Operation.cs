@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace KypterUnIAPI.Core.Database
+namespace SimpliarSQL.Core.MySQL
 {
     public abstract class Operation<TResult>
     {

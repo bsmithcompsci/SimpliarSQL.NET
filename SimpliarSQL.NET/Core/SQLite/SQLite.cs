@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GoodAdmin_API.Core.Database
+namespace SimpliarSQL.Core.SQLite
 {
     public class SQLite
     {

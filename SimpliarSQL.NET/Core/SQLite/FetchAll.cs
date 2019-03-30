@@ -2,7 +2,7 @@
 using System.Data.SQLite;
 using System.Threading.Tasks;
 
-namespace GoodAdmin_API.Core.Database
+namespace SimpliarSQL.Core.SQLite
 {
     public class FetchAll : Operation<List<Dictionary<string, object>>>
     {

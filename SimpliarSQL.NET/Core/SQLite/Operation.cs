@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GoodAdmin_API.Core.Database
+namespace SimpliarSQL.Core.SQLite
 {
     public abstract class Operation<TResult>
     {

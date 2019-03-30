@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoodAdmin_API.Core.Database
+namespace SimpliarSQL.Core.SQLite
 {
     public class FetchScalar : Operation<object>
     {

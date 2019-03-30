@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace KypterUnIAPI.Core.Database
+
+namespace SimpliarSQL.Core.MySQL
 {
     public class FetchAll : Operation<List<Dictionary<string, object>>>
     {

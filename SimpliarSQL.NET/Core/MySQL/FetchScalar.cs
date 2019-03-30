@@ -1,7 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 
-namespace KypterUnIAPI.Core.Database
+
+namespace SimpliarSQL.Core.MySQL
 {
     public class FetchScalar : Operation<object>
     {
