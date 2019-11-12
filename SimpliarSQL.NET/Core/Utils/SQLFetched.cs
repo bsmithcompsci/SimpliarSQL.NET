@@ -2,13 +2,22 @@
 
 namespace SimpliarSQL.NET.Core.Utils
 {
-    public class SQLReturnFetched
+    public class SQLFetched
     {
         private List<Dictionary<string, object>> rows;
 
-        public SQLReturnFetched(List<Dictionary<string, object>> rows)
+        public SQLFetched(List<Dictionary<string, object>> rows)
         {
             this.rows = rows;
+        }
+
+        public Dictionary<string, object> First()
+        {
+            return GetRows()[0];
+        }
+        public Dictionary<string, object> Last()
+        {
+            return GetRows()[GetRows().Count - 1];
         }
 
         public List<Dictionary<string, object>> FindAllByKey(params string[] keys)

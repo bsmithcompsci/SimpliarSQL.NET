@@ -148,7 +148,7 @@ namespace SimpliarSQL.NET.Core
             return -1;
         }
 
-        public SQLReturnFetched GetAllDatabases(bool debug = false)
+        public SQLFetched GetAllDatabases(bool debug = false)
         {
             switch (this.activeType)
             {
@@ -157,10 +157,10 @@ namespace SimpliarSQL.NET.Core
                 case ESQLTypes.SQLite:
                     return SQLite.SQLite.GetAllDatabases(debug);
             }
-            return new SQLReturnFetched(new List<Dictionary<string, object>>());
+            return new SQLFetched(new List<Dictionary<string, object>>());
         }
 
-        public async Task<SQLReturnFetched> GetAllDatabasesAsync(Action<SQLReturnFetched> callback, bool debug = false)
+        public async Task<SQLFetched> GetAllDatabasesAsync(Action<SQLFetched> callback, bool debug = false)
         {
             switch (this.activeType)
             {
@@ -169,7 +169,7 @@ namespace SimpliarSQL.NET.Core
                 case ESQLTypes.SQLite:
                     return await SQLite.SQLite.GetAllDatabasesAsync(callback, debug);
             }
-            return new SQLReturnFetched(new List<Dictionary<string, object>>());
+            return new SQLFetched(new List<Dictionary<string, object>>());
         }
 
         public bool DatabaseExists(string database, bool debug = false)
@@ -196,7 +196,7 @@ namespace SimpliarSQL.NET.Core
             return false;
         }
 
-        public SQLReturnFetched GetAllTables(string database, bool debug = false)
+        public SQLFetched GetAllTables(string database, bool debug = false)
         {
             switch (this.activeType)
             {
@@ -205,10 +205,10 @@ namespace SimpliarSQL.NET.Core
                 case ESQLTypes.SQLite:
                     return SQLite.SQLite.GetAllTables(database, debug);
             }
-            return new SQLReturnFetched(new List<Dictionary<string, object>>());
+            return new SQLFetched(new List<Dictionary<string, object>>());
         }
 
-        public async Task<SQLReturnFetched> GetAllTablesAsync(string database, Action<SQLReturnFetched> callback, bool debug = false)
+        public async Task<SQLFetched> GetAllTablesAsync(string database, Action<SQLFetched> callback, bool debug = false)
         {
             switch (this.activeType)
             {
@@ -217,7 +217,7 @@ namespace SimpliarSQL.NET.Core
                 case ESQLTypes.SQLite:
                     return await SQLite.SQLite.GetAllTablesAsync(database, callback, debug);
             }
-            return new SQLReturnFetched(new List<Dictionary<string, object>>());
+            return new SQLFetched(new List<Dictionary<string, object>>());
         }
 
         public bool TablesExists(string database, string table, bool debug = false)

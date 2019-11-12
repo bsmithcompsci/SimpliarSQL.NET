@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SimpliarSQL.NET.Core.MySQL
 {
-    public class FetchAll : Operation<SQLReturnFetched>
+    public class FetchAll : Operation<SQLFetched>
     {
         public FetchAll(string connectionString) : base(connectionString) { }
 
-        protected override SQLReturnFetched Reader(MySqlCommand cmd)
+        protected override SQLFetched Reader(MySqlCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -30,10 +30,10 @@ namespace SimpliarSQL.NET.Core.MySQL
                         results.Add(line);
                     }
             }
-            return new SQLReturnFetched(results);
+            return new SQLFetched(results);
         }
 
-        protected override async Task<SQLReturnFetched> ReaderAsync(MySqlCommand cmd)
+        protected override async Task<SQLFetched> ReaderAsync(MySqlCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -53,7 +53,7 @@ namespace SimpliarSQL.NET.Core.MySQL
                         results.Add(line);
                     }
             }
-            return new SQLReturnFetched(results);
+            return new SQLFetched(results);
         }
     }
 }

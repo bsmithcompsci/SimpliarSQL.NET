@@ -67,7 +67,7 @@ namespace SimpliarSQL.NET.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static SQLReturnFetched FetchAll(string query, PreparedList parameters = null, bool debug = false)
+        public static SQLFetched FetchAll(string query, PreparedList parameters = null, bool debug = false)
         {
             return new FetchAll(SQLite.connectionString).Execute(query, parameters, debug);
         }
@@ -80,7 +80,7 @@ namespace SimpliarSQL.NET.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static async Task<SQLReturnFetched> FetchAllAsync(string query, Action<SQLReturnFetched> callback, PreparedList parameters = null, bool debug = false)
+        public static async Task<SQLFetched> FetchAllAsync(string query, Action<SQLFetched> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new FetchAll(SQLite.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -163,19 +163,19 @@ namespace SimpliarSQL.NET.Core.SQLite
             }), debug: debug);
         }
 
-        public static SQLReturnFetched GetAllDatabases(bool debug = false)
+        public static SQLFetched GetAllDatabases(bool debug = false)
         {
             return FetchAll($"SHOW DATABASES;", new PreparedList { }, debug);
         }
 
-        public static async Task<SQLReturnFetched> GetAllDatabasesAsync(Action<SQLReturnFetched> callback, bool debug = false)
+        public static async Task<SQLFetched> GetAllDatabasesAsync(Action<SQLFetched> callback, bool debug = false)
         {
             return await FetchAllAsync($"SHOW DATABASES;", callback, new PreparedList { }, debug);
         }
 
         public static bool DatabaseExists(string database, bool debug = false)
         {
-            SQLReturnFetched databases = GetAllDatabases(debug);
+            SQLFetched databases = GetAllDatabases(debug);
 
             foreach (var list in databases.GetRows())
             {
@@ -191,7 +191,7 @@ namespace SimpliarSQL.NET.Core.SQLite
 
         public static async Task<object> DatabaseExistsAsync(string database, Action<bool> callback, bool debug = false)
         {
-            return await GetAllDatabasesAsync(new Action<SQLReturnFetched>((x) => {
+            return await GetAllDatabasesAsync(new Action<SQLFetched>((x) => {
                 bool found = false;
                 foreach (var list in x.GetRows())
                 {
@@ -212,19 +212,19 @@ namespace SimpliarSQL.NET.Core.SQLite
             }), debug);
         }
 
-        public static SQLReturnFetched GetAllTables(string database, bool debug = false)
+        public static SQLFetched GetAllTables(string database, bool debug = false)
         {
             return FetchAll($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
-        public static async Task<SQLReturnFetched> GetAllTablesAsync(string database, Action<SQLReturnFetched> callback, bool debug = false)
+        public static async Task<SQLFetched> GetAllTablesAsync(string database, Action<SQLFetched> callback, bool debug = false)
         {
             return await FetchAllAsync($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", callback, new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
         public static bool TablesExists(string database, string table, bool debug = false)
         {
-            SQLReturnFetched databases = GetAllTables(database, debug);
+            SQLFetched databases = GetAllTables(database, debug);
 
             foreach (var list in databases.GetRows())
             {
@@ -242,7 +242,7 @@ namespace SimpliarSQL.NET.Core.SQLite
         {
             return await Task.Run(() =>
             {
-                SQLReturnFetched databases = GetAllTables(database, debug);
+                SQLFetched databases = GetAllTables(database, debug);
 
                 foreach (var list in databases.GetRows())
                 {

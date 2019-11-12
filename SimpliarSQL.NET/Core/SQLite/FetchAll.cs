@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace SimpliarSQL.NET.Core.SQLite
 {
-    public class FetchAll : Operation<SQLReturnFetched>
+    public class FetchAll : Operation<SQLFetched>
     {
         public FetchAll(string connectionString) : base(connectionString) { }
 
-        protected override SQLReturnFetched Reader(SQLiteCommand cmd)
+        protected override SQLFetched Reader(SQLiteCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -31,10 +31,10 @@ namespace SimpliarSQL.NET.Core.SQLite
                     }
                 }
             }
-            return new SQLReturnFetched(results);
+            return new SQLFetched(results);
         }
 
-        protected override async Task<SQLReturnFetched> ReaderAsync(SQLiteCommand cmd)
+        protected override async Task<SQLFetched> ReaderAsync(SQLiteCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -56,7 +56,7 @@ namespace SimpliarSQL.NET.Core.SQLite
                     }
                 }
             }
-            return new SQLReturnFetched(results);
+            return new SQLFetched(results);
         }
     }
 }

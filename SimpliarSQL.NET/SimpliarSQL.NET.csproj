@@ -127,7 +127,7 @@
     <Compile Include="Core\Utils\PreparedCompiledList.cs" />
     <Compile Include="Core\Utils\PreparedList.cs" />
     <Compile Include="Core\Utils\PreparedStatement.cs" />
-    <Compile Include="Core\Utils\SQLReturnFetched.cs" />
+    <Compile Include="Core\Utils\SQLFetched.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
