@@ -30,7 +30,15 @@ namespace SimpliarSQL.NET.Core.MySQL
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        if (parameters != null) cmd.Parameters.AddRange(parameters.ToArray());
+                        if (parameters != null)
+                        {
+                            List<MySqlParameter> _parameters = new List<MySqlParameter>();
+                            foreach (PreparedStatement statement in parameters)
+                            {
+                                _parameters.Add(new MySqlParameter(statement.GetKey(), statement.GetValue()));
+                            }
+                            cmd.Parameters.AddRange(_parameters.ToArray());
+                        }
                         result = Reader(cmd);
 
                         if (debug)
