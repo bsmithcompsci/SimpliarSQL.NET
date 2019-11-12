@@ -14,7 +14,7 @@ namespace SimpliarSQL.Core.SQLite
         /// Will connect to the database, either by creating a new one or by purely connecting to an existing one.
         /// </summary>
         /// <returns></returns>
-        public static Task Verify(string filename, string path = "")
+        public static string Verify(string filename, string path = "")
         {
             string reference = Path.Combine(Path.GetFullPath("./"), path) + filename + ".sqlite";
             if (!File.Exists(reference))
@@ -22,7 +22,16 @@ namespace SimpliarSQL.Core.SQLite
 
             SQLite.connectionString = "Data Source=" + reference;
 
-            return Task.CompletedTask;
+            return connectionString;
+        }
+
+        /// <summary>
+        /// Grabs the local connection string...
+        /// </summary>
+        /// <returns></returns>
+        public static string GetConnectionString()
+        {
+            return connectionString;
         }
 
         /// <summary>
@@ -130,7 +139,7 @@ namespace SimpliarSQL.Core.SQLite
             return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new List<SQLiteParameter> { new SQLiteParameter("@name", name), new SQLiteParameter("?", string.Join(",", parameters)) }, debug);
         }
 
-        public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<SQLiteParameter> parameters, bool debug = false)
+        public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<string> parameters, bool debug = false)
         {
             return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new List<SQLiteParameter> { new SQLiteParameter("@name", name), new SQLiteParameter("?", string.Join(",", parameters)) }, debug);
         }
@@ -228,19 +237,26 @@ namespace SimpliarSQL.Core.SQLite
             return false;
         }
 
-        public static async Task<object> TablesExistsAsync(string database, string table, Action<bool> callback, bool debug = false)
+        public static async Task<bool> TablesExistsAsync(string database, string table, Action<bool> callback, bool debug = false)
         {
-            return await GetAllTablesAsync(database, new Action<List<Dictionary<string, object>>>((x) => {
-                foreach (var list in x)
+            return await Task.Run(() =>
+            {
+                List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+
+                foreach (var list in databases)
                 {
                     foreach (var pair in list)
                     {
                         if (pair.Value.ToString().ToLower() == table.ToLower())
+                        {
                             callback(true);
+                            return true;
+                        }
                     }
                 }
                 callback(false);
-            }), debug);
+                return false;
+            });
         }
         #endregion
     }

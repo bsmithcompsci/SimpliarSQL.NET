@@ -10,11 +10,47 @@ namespace SimpliarSQL.Core.MySQL
     {
         private static string connectionString = "";
 
+        public static string Connect(string source, string username, string password, string database = "", bool createDatabase = false, bool debug = false)
+        {
+
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder
+            {
+                Server = source,
+                Database = (!createDatabase ? database : ""),
+                UserID = username,
+                Password = password
+            };
+
+            MySQL.connectionString = builder.ToString();
+
+            if (debug || createDatabase)
+                try
+                {
+                    var con = new MySqlConnection
+                    {
+                        ConnectionString = MySQL.connectionString
+                    };
+                    con.Open();
+
+                    if (createDatabase)
+                        CreateDatabase(database, debug);
+
+                    con.Close();
+
+                    Console.WriteLine($"Connection to SQL Service was successful -> {source}:{3306} | {database}");
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine($"Failed Connection to SQL Service -> {source}:{3306} | {database} :: " + ex.Message);
+                }
+            return connectionString;
+        }
+
         /// <summary>
         /// Will connect to the database, either by creating a new one or by purely connecting to an existing one.
         /// </summary>
         /// <returns></returns>
-        public static async Task Connect(string source, string username, string password, string database = "", bool createDatabase = false, bool debug = false)
+        public static async Task<string> ConnectAsync(string source, string username, string password, string database = "", bool createDatabase = false, bool debug = false)
         {
             MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder
             {
@@ -49,6 +85,7 @@ namespace SimpliarSQL.Core.MySQL
                 {
                     Console.WriteLine($"Failed Connection to SQL Service -> {source}:{3306} | {database} :: " + ex.Message);
                 }
+            return connectionString;
         }
 
         public static int Execute(string query, List<MySqlParameter> parameters = null, bool debug = false)
@@ -97,7 +134,7 @@ namespace SimpliarSQL.Core.MySQL
             return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new List<MySqlParameter> { new MySqlParameter("@name", name), new MySqlParameter("?", string.Join(",", parameters)) }, debug);
         }
 
-        public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<MySqlParameter> parameters, bool debug = false)
+        public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<string> parameters, bool debug = false)
         {
             return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new List<MySqlParameter> { new MySqlParameter("@name", name), new MySqlParameter("?", string.Join(",", parameters)) }, debug);
         }
@@ -195,19 +232,26 @@ namespace SimpliarSQL.Core.MySQL
             return false;
         }
 
-        public static async Task<object> TablesExistsAsync(string database, string table, Action<bool> callback, bool debug = false)
+        public static async Task<bool> TablesExistsAsync(string database, string table, Action<bool> callback, bool debug = false)
         {
-            return await GetAllTablesAsync(database, new Action<List<Dictionary<string, object>>>((x) => {
-                foreach (var list in x)
+            return await Task.Run(() =>
+            {
+                List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+
+                foreach (var list in databases)
                 {
                     foreach (var pair in list)
                     {
                         if (pair.Value.ToString().ToLower() == table.ToLower())
+                        {
                             callback(true);
+                            return true;
+                        }
                     }
                 }
                 callback(false);
-            }), debug);
+                return false;
+            });
         }
         #endregion
     }
