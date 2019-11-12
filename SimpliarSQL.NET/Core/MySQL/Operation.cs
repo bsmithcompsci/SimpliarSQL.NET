@@ -1,11 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
+using SimpliarSQL.NET.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.MySQL
+namespace SimpliarSQL.NET.Core.MySQL
 {
     public abstract class Operation<TResult>
     {
@@ -13,7 +14,7 @@ namespace SimpliarSQL.Core.MySQL
 
         public Operation(string connectionString) => this.connectionString = connectionString;
 
-        public TResult Execute(string query, List<MySqlParameter> parameters = null, bool debug = false)
+        public TResult Execute(string query, PreparedList parameters = null, bool debug = false)
         {
             TResult result = default(TResult);
 
@@ -60,7 +61,7 @@ namespace SimpliarSQL.Core.MySQL
 
             return result;
         }
-        public async Task<TResult> ExecuteAsync(string query, Action<TResult> asyncCallback, List<MySqlParameter> parameters = null, bool debug = false)
+        public async Task<TResult> ExecuteAsync(string query, Action<TResult> asyncCallback, PreparedList parameters = null, bool debug = false)
         {
             TResult result = default(TResult);
 
@@ -113,7 +114,7 @@ namespace SimpliarSQL.Core.MySQL
         abstract protected TResult Reader(MySqlCommand cmd);
         abstract protected Task<TResult> ReaderAsync(MySqlCommand cmd);
 
-        private string QueryToString(string query, List<MySqlParameter> parameters)
+        private string QueryToString(string query, PreparedList parameters)
         {
             //return query + " {" + string.Join(";", parameters.Select(x => x.ParameterName + "=" + x.Value).ToArray() + "}");
             string result = query;

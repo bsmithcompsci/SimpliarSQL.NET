@@ -1,15 +1,16 @@
 ﻿using MySql.Data.MySqlClient;
+using SimpliarSQL.NET.Core.Utils;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
-namespace SimpliarSQL.Core.MySQL
+namespace SimpliarSQL.NET.Core.MySQL
 {
-    public class FetchAll : Operation<List<Dictionary<string, object>>>
+    public class FetchAll : Operation<SQLReturnFetched>
     {
         public FetchAll(string connectionString) : base(connectionString) { }
 
-        protected override List<Dictionary<string, object>> Reader(MySqlCommand cmd)
+        protected override SQLReturnFetched Reader(MySqlCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -29,10 +30,10 @@ namespace SimpliarSQL.Core.MySQL
                         results.Add(line);
                     }
             }
-            return results;
+            return new SQLReturnFetched(results);
         }
 
-        protected override async Task<List<Dictionary<string, object>>> ReaderAsync(MySqlCommand cmd)
+        protected override async Task<SQLReturnFetched> ReaderAsync(MySqlCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -52,7 +53,7 @@ namespace SimpliarSQL.Core.MySQL
                         results.Add(line);
                     }
             }
-            return results;
+            return new SQLReturnFetched(results);
         }
     }
 }

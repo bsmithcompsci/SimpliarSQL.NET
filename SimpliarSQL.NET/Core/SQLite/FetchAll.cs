@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using SimpliarSQL.NET.Core.Utils;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.SQLite
+namespace SimpliarSQL.NET.Core.SQLite
 {
-    public class FetchAll : Operation<List<Dictionary<string, object>>>
+    public class FetchAll : Operation<SQLReturnFetched>
     {
         public FetchAll(string connectionString) : base(connectionString) { }
 
-        protected override List<Dictionary<string, object>> Reader(SQLiteCommand cmd)
+        protected override SQLReturnFetched Reader(SQLiteCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -30,10 +31,10 @@ namespace SimpliarSQL.Core.SQLite
                     }
                 }
             }
-            return results;
+            return new SQLReturnFetched(results);
         }
 
-        protected override async Task<List<Dictionary<string, object>>> ReaderAsync(SQLiteCommand cmd)
+        protected override async Task<SQLReturnFetched> ReaderAsync(SQLiteCommand cmd)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -55,7 +56,7 @@ namespace SimpliarSQL.Core.SQLite
                     }
                 }
             }
-            return results;
+            return new SQLReturnFetched(results);
         }
     }
 }

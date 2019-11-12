@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.MySQL
+namespace SimpliarSQL.NET.Core.MySQL
 {
     public class Execute : Operation<int>
     {

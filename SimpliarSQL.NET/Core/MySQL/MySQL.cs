@@ -1,10 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
+using SimpliarSQL.NET.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
-namespace SimpliarSQL.Core.MySQL
+namespace SimpliarSQL.NET.Core.MySQL
 {
     public class MySQL
     {
@@ -88,42 +89,42 @@ namespace SimpliarSQL.Core.MySQL
             return connectionString;
         }
 
-        public static int Execute(string query, List<MySqlParameter> parameters = null, bool debug = false)
+        public static int Execute(string query, PreparedList parameters = null, bool debug = false)
         {
             return new Execute(MySQL.connectionString).Execute(query, parameters, debug);
         }
 
-        public static async Task<int> ExecuteAsync(string query, Action<int> callback, List<MySqlParameter> parameters = null, bool debug = false)
+        public static async Task<int> ExecuteAsync(string query, Action<int> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new Execute(MySQL.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
 
-        public static List<Dictionary<string, object>> FetchAll(string query, List<MySqlParameter> parameters = null, bool debug = false)
+        public static SQLReturnFetched FetchAll(string query, PreparedList parameters = null, bool debug = false)
         {
             return new FetchAll(MySQL.connectionString).Execute(query, parameters, debug);
         }
 
-        public static async Task<List<Dictionary<string, object>>> FetchAllAsync(string query, Action<List<Dictionary<string, object>>> callback, List<MySqlParameter> parameters = null, bool debug = false)
+        public static async Task<SQLReturnFetched> FetchAllAsync(string query, Action<SQLReturnFetched> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new FetchAll(MySQL.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
 
-        public static object FetchScalar(string query, List<MySqlParameter> parameters = null, bool debug = false)
+        public static object FetchScalar(string query, PreparedList parameters = null, bool debug = false)
         {
             return new FetchScalar(MySQL.connectionString).Execute(query, parameters, debug);
         }
 
-        public static async Task<object> FetchScalarAsync(string query, Action<object> callback, List<MySqlParameter> parameters = null, bool debug = false)
+        public static async Task<object> FetchScalarAsync(string query, Action<object> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new FetchScalar(MySQL.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
 
-        public static object Insert(string query, List<MySqlParameter> parameters = null, bool debug = false)
+        public static object Insert(string query, PreparedList parameters = null, bool debug = false)
         {
             return new Insert(MySQL.connectionString).Execute(query, parameters, debug);
         }
 
-        public static async Task<object> InsertAsync(string query, Action<object> callback, List<MySqlParameter> parameters = null, bool debug = false)
+        public static async Task<object> InsertAsync(string query, Action<object> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new Insert(MySQL.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -131,18 +132,18 @@ namespace SimpliarSQL.Core.MySQL
         #region API
         public static int CreateTable(string name, List<string> parameters, bool debug = false)
         {
-            return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new List<MySqlParameter> { new MySqlParameter("@name", name), new MySqlParameter("?", string.Join(",", parameters)) }, debug);
+            return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new PreparedList { new PreparedStatement("@name", name), new PreparedStatement("?", string.Join(",", parameters)) }, debug);
         }
 
         public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<string> parameters, bool debug = false)
         {
-            return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new List<MySqlParameter> { new MySqlParameter("@name", name), new MySqlParameter("?", string.Join(",", parameters)) }, debug);
+            return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new PreparedList { new PreparedStatement("@name", name), new PreparedStatement("?", string.Join(",", parameters)) }, debug);
         }
 
         public static int CreateDatabase(string name, bool debug = false)
         {
             if (!DatabaseExists(name, debug))
-                return Execute($"CREATE DATABASE `@name`;", new List<MySqlParameter> { new MySqlParameter("@name", name) }, debug);
+                return Execute($"CREATE DATABASE `@name`;", new PreparedList { new PreparedStatement("@name", name) }, debug);
             else
                 return -1;
         }
@@ -151,27 +152,27 @@ namespace SimpliarSQL.Core.MySQL
         {
             return await DatabaseExistsAsync(name, new Action<bool>(async (x) => {
                 if (!x)
-                    callback(await ExecuteAsync($"CREATE DATABASE `@name`;", null, new List<MySqlParameter> { new MySqlParameter("@name", name) }, debug));
+                    callback(await ExecuteAsync($"CREATE DATABASE `@name`;", null, new PreparedList { new PreparedStatement("@name", name) }, debug));
                 else
                     callback(-1);
             }), debug: debug);
         }
 
-        public static List<Dictionary<string, object>> GetAllDatabases(bool debug = false)
+        public static SQLReturnFetched GetAllDatabases(bool debug = false)
         {
-            return FetchAll($"SHOW DATABASES;", new List<MySqlParameter> { }, debug);
+            return FetchAll($"SHOW DATABASES;", new PreparedList { }, debug);
         }
 
-        public static async Task<List<Dictionary<string, object>>> GetAllDatabasesAsync(Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public static async Task<SQLReturnFetched> GetAllDatabasesAsync(Action<SQLReturnFetched> callback, bool debug = false)
         {
-            return await FetchAllAsync($"SHOW DATABASES;", callback, new List<MySqlParameter> { }, debug);
+            return await FetchAllAsync($"SHOW DATABASES;", callback, new PreparedList { }, debug);
         }
 
         public static bool DatabaseExists(string database, bool debug = false)
         {
-            List<Dictionary<string, object>> databases = GetAllDatabases(debug);
+            SQLReturnFetched databases = GetAllDatabases(debug);
 
-            foreach (var list in databases)
+            foreach (var list in databases.GetRows())
             {
                 foreach (var pair in list)
                 {
@@ -185,9 +186,9 @@ namespace SimpliarSQL.Core.MySQL
 
         public static async Task<object> DatabaseExistsAsync(string database, Action<bool> callback, bool debug = false)
         {
-            return await GetAllDatabasesAsync(new Action<List<Dictionary<string, object>>>((x) => {
+            return await GetAllDatabasesAsync(new Action<SQLReturnFetched>((x) => {
                 bool found = false;
-                foreach (var list in x)
+                foreach (var list in x.GetRows())
                 {
                     foreach (var pair in list)
                     {
@@ -206,21 +207,21 @@ namespace SimpliarSQL.Core.MySQL
             }), debug);
         }
 
-        public static List<Dictionary<string, object>> GetAllTables(string database, bool debug = false)
+        public static SQLReturnFetched GetAllTables(string database, bool debug = false)
         {
-            return FetchAll($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", new List<MySqlParameter> { new MySqlParameter("@database", database) }, debug);
+            return FetchAll($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
-        public static async Task<List<Dictionary<string, object>>> GetAllTablesAsync(string database, Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public static async Task<SQLReturnFetched> GetAllTablesAsync(string database, Action<SQLReturnFetched> callback, bool debug = false)
         {
-            return await FetchAllAsync($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", callback, new List<MySqlParameter> { new MySqlParameter("@database", database) }, debug);
+            return await FetchAllAsync($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", callback, new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
         public static bool TablesExists(string database, string table, bool debug = false)
         {
-            List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+            SQLReturnFetched databases = GetAllTables(database, debug);
 
-            foreach (var list in databases)
+            foreach (var list in databases.GetRows())
             {
                 foreach (var pair in list)
                 {
@@ -236,9 +237,9 @@ namespace SimpliarSQL.Core.MySQL
         {
             return await Task.Run(() =>
             {
-                List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+                SQLReturnFetched databases = GetAllTables(database, debug);
 
-                foreach (var list in databases)
+                foreach (var list in databases.GetRows())
                 {
                     foreach (var pair in list)
                     {

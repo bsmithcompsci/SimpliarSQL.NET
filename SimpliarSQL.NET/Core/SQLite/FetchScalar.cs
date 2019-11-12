@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.SQLite
+namespace SimpliarSQL.NET.Core.SQLite
 {
     public class FetchScalar : Operation<object>
     {

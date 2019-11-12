@@ -2,7 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace SimpliarSQL.Core.Encryption
+namespace SimpliarSQL.NET.Core.Encryption
 {
     public class Hash
     {

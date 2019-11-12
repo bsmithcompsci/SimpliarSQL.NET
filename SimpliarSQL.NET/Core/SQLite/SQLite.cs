@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SimpliarSQL.NET.Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.SQLite
+namespace SimpliarSQL.NET.Core.SQLite
 {
     public class SQLite
     {
@@ -41,7 +42,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static int Execute(string query, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static int Execute(string query, PreparedList parameters = null, bool debug = false)
         {
             return new Execute(SQLite.connectionString).Execute(query, parameters, debug);
         }
@@ -54,7 +55,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static async Task<int> ExecuteAsync(string query, Action<int> callback, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static async Task<int> ExecuteAsync(string query, Action<int> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new Execute(SQLite.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -66,7 +67,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> FetchAll(string query, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static SQLReturnFetched FetchAll(string query, PreparedList parameters = null, bool debug = false)
         {
             return new FetchAll(SQLite.connectionString).Execute(query, parameters, debug);
         }
@@ -79,7 +80,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static async Task<List<Dictionary<string, object>>> FetchAllAsync(string query, Action<List<Dictionary<string, object>>> callback, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static async Task<SQLReturnFetched> FetchAllAsync(string query, Action<SQLReturnFetched> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new FetchAll(SQLite.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -91,7 +92,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static object FetchScalar(string query, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static object FetchScalar(string query, PreparedList parameters = null, bool debug = false)
         {
             return new FetchScalar(SQLite.connectionString).Execute(query, parameters, debug);
         }
@@ -103,7 +104,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static async Task<object> FetchScalarAsync(string query, Action<object> callback, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static async Task<object> FetchScalarAsync(string query, Action<object> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new FetchScalar(SQLite.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -115,7 +116,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static object Insert(string query, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static object Insert(string query, PreparedList parameters = null, bool debug = false)
         {
             return new Insert(SQLite.connectionString).Execute(query, parameters, debug);
         }
@@ -128,7 +129,7 @@ namespace SimpliarSQL.Core.SQLite
         /// <param name="parameters"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        public static async Task<object> InsertAsync(string query, Action<object> callback, List<SQLiteParameter> parameters = null, bool debug = false)
+        public static async Task<object> InsertAsync(string query, Action<object> callback, PreparedList parameters = null, bool debug = false)
         {
             return await new Insert(SQLite.connectionString).ExecuteAsync(query, callback, parameters, debug);
         }
@@ -136,18 +137,18 @@ namespace SimpliarSQL.Core.SQLite
         #region API
         public static int CreateTable(string name, List<string> parameters, bool debug = false)
         {
-            return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new List<SQLiteParameter> { new SQLiteParameter("@name", name), new SQLiteParameter("?", string.Join(",", parameters)) }, debug);
+            return Execute($"CREATE TABLE IF NOT EXISTS `@name` (?)", new PreparedList { new PreparedStatement("@name", name), new PreparedStatement("?", string.Join(",", parameters)) }, debug);
         }
 
         public static async Task<int> CreateTableAsync(string name, Action<int> callback, List<string> parameters, bool debug = false)
         {
-            return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new List<SQLiteParameter> { new SQLiteParameter("@name", name), new SQLiteParameter("?", string.Join(",", parameters)) }, debug);
+            return await ExecuteAsync($"CREATE TABLE IF NOT EXISTS `@name` (?)", callback, new PreparedList { new PreparedStatement("@name", name), new PreparedStatement("?", string.Join(",", parameters)) }, debug);
         }
 
         public static int CreateDatabase(string name, bool debug = false)
         {
             if (!DatabaseExists(name, debug))
-                return Execute($"CREATE DATABASE `@name`;", new List<SQLiteParameter> { new SQLiteParameter("@name", name) }, debug);
+                return Execute($"CREATE DATABASE `@name`;", new PreparedList { new PreparedStatement("@name", name) }, debug);
             else
                 return -1;
         }
@@ -156,27 +157,27 @@ namespace SimpliarSQL.Core.SQLite
         {
             return await DatabaseExistsAsync(name, new Action<bool>(async (x) => {
                 if (!x)
-                    callback(await ExecuteAsync($"CREATE DATABASE `@name`;", null, new List<SQLiteParameter> { new SQLiteParameter("@name", name) }, debug));
+                    callback(await ExecuteAsync($"CREATE DATABASE `@name`;", null, new PreparedList { new PreparedStatement("@name", name) }, debug));
                 else
                     callback(-1);
             }), debug: debug);
         }
 
-        public static List<Dictionary<string, object>> GetAllDatabases(bool debug = false)
+        public static SQLReturnFetched GetAllDatabases(bool debug = false)
         {
-            return FetchAll($"SHOW DATABASES;", new List<SQLiteParameter> { }, debug);
+            return FetchAll($"SHOW DATABASES;", new PreparedList { }, debug);
         }
 
-        public static async Task<List<Dictionary<string, object>>> GetAllDatabasesAsync(Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public static async Task<SQLReturnFetched> GetAllDatabasesAsync(Action<SQLReturnFetched> callback, bool debug = false)
         {
-            return await FetchAllAsync($"SHOW DATABASES;", callback, new List<SQLiteParameter> { }, debug);
+            return await FetchAllAsync($"SHOW DATABASES;", callback, new PreparedList { }, debug);
         }
 
         public static bool DatabaseExists(string database, bool debug = false)
         {
-            List<Dictionary<string, object>> databases = GetAllDatabases(debug);
+            SQLReturnFetched databases = GetAllDatabases(debug);
 
-            foreach (var list in databases)
+            foreach (var list in databases.GetRows())
             {
                 foreach (var pair in list)
                 {
@@ -190,9 +191,9 @@ namespace SimpliarSQL.Core.SQLite
 
         public static async Task<object> DatabaseExistsAsync(string database, Action<bool> callback, bool debug = false)
         {
-            return await GetAllDatabasesAsync(new Action<List<Dictionary<string, object>>>((x) => {
+            return await GetAllDatabasesAsync(new Action<SQLReturnFetched>((x) => {
                 bool found = false;
-                foreach (var list in x)
+                foreach (var list in x.GetRows())
                 {
                     foreach (var pair in list)
                     {
@@ -211,21 +212,21 @@ namespace SimpliarSQL.Core.SQLite
             }), debug);
         }
 
-        public static List<Dictionary<string, object>> GetAllTables(string database, bool debug = false)
+        public static SQLReturnFetched GetAllTables(string database, bool debug = false)
         {
-            return FetchAll($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", new List<SQLiteParameter> { new SQLiteParameter("@database", database) }, debug);
+            return FetchAll($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
-        public static async Task<List<Dictionary<string, object>>> GetAllTablesAsync(string database, Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public static async Task<SQLReturnFetched> GetAllTablesAsync(string database, Action<SQLReturnFetched> callback, bool debug = false)
         {
-            return await FetchAllAsync($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", callback, new List<SQLiteParameter> { new SQLiteParameter("@database", database) }, debug);
+            return await FetchAllAsync($"SELECT table_name FROM information_schema.tables WHERE table_schema=@database;", callback, new PreparedList { new PreparedStatement("@database", database) }, debug);
         }
 
         public static bool TablesExists(string database, string table, bool debug = false)
         {
-            List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+            SQLReturnFetched databases = GetAllTables(database, debug);
 
-            foreach (var list in databases)
+            foreach (var list in databases.GetRows())
             {
                 foreach (var pair in list)
                 {
@@ -241,9 +242,9 @@ namespace SimpliarSQL.Core.SQLite
         {
             return await Task.Run(() =>
             {
-                List<Dictionary<string, object>> databases = GetAllTables(database, debug);
+                SQLReturnFetched databases = GetAllTables(database, debug);
 
-                foreach (var list in databases)
+                foreach (var list in databases.GetRows())
                 {
                     foreach (var pair in list)
                     {

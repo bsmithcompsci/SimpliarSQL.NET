@@ -1,7 +1,7 @@
 ﻿using System.Data.SQLite;
 using System.Threading.Tasks;
 
-namespace SimpliarSQL.Core.SQLite
+namespace SimpliarSQL.NET.Core.SQLite
 {
     public class Execute : Operation<int>
     {

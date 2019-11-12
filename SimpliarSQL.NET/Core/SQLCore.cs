@@ -1,9 +1,6 @@
-﻿using MySql.Data.MySqlClient;
-using SimpliarSQL.Core.MySQL;
-using SimpliarSQL.Core.SQLite;
+﻿using SimpliarSQL.NET.Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Threading.Tasks;
 
 namespace SimpliarSQL.NET.Core
@@ -36,16 +33,16 @@ namespace SimpliarSQL.NET.Core
             switch (activeType)
             {
                 case ESQLTypes.MySQL:
-                    connection_string = MySQL.Connect(source, username, password, database, true);
+                    connection_string = MySQL.MySQL.Connect(source, username, password, database, true);
                     break;
                 case ESQLTypes.SQLite:
-                    connection_string = SQLite.Verify(database);
+                    connection_string = SQLite.SQLite.Verify(database);
                     break;
             }
         }
 
         /// <summary>
-        /// Initializes the SQLite in a easier function.
+        /// Initializes the SQLite.SQLite in a easier function.
         /// </summary>
         /// <param name="database"></param>
         public void Initialize(string database)
@@ -69,10 +66,10 @@ namespace SimpliarSQL.NET.Core
             switch (activeType)
             {
                 case ESQLTypes.MySQL:
-                    connection_string = await MySQL.ConnectAsync(source, username, password, database, true);
+                    connection_string = await MySQL.MySQL.ConnectAsync(source, username, password, database, true);
                     break;
                 case ESQLTypes.SQLite:
-                    connection_string = SQLite.Verify(database);
+                    connection_string = SQLite.SQLite.Verify(database);
                     break;
             }
         }
@@ -108,9 +105,9 @@ namespace SimpliarSQL.NET.Core
             switch(this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.CreateTable(name, parameters, debug);
+                    return MySQL.MySQL.CreateTable(name, parameters, debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.CreateTable(name, parameters, debug);
+                    return SQLite.SQLite.CreateTable(name, parameters, debug);
             }
             return -1;
         }
@@ -120,9 +117,9 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.CreateTableAsync(name, callback, parameters, debug);
+                    return await MySQL.MySQL.CreateTableAsync(name, callback, parameters, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.CreateTableAsync(name, callback, parameters, debug);
+                    return await SQLite.SQLite.CreateTableAsync(name, callback, parameters, debug);
             }
             return -1;
         }
@@ -132,9 +129,9 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.CreateDatabase(name, debug);
+                    return MySQL.MySQL.CreateDatabase(name, debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.CreateDatabase(name, debug);
+                    return SQLite.SQLite.CreateDatabase(name, debug);
             }
             return -1;
         }
@@ -144,35 +141,35 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.CreateDatabaseAsync(name, callback, debug);
+                    return await MySQL.MySQL.CreateDatabaseAsync(name, callback, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.CreateDatabaseAsync(name, callback, debug);
+                    return await SQLite.SQLite.CreateDatabaseAsync(name, callback, debug);
             }
             return -1;
         }
 
-        public List<Dictionary<string, object>> GetAllDatabases(bool debug = false)
+        public SQLReturnFetched GetAllDatabases(bool debug = false)
         {
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.GetAllDatabases(debug);
+                    return MySQL.MySQL.GetAllDatabases(debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.GetAllDatabases(debug);
+                    return SQLite.SQLite.GetAllDatabases(debug);
             }
-            return new List<Dictionary<string, object>>();
+            return new SQLReturnFetched(new List<Dictionary<string, object>>());
         }
 
-        public async Task<List<Dictionary<string, object>>> GetAllDatabasesAsync(Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public async Task<SQLReturnFetched> GetAllDatabasesAsync(Action<SQLReturnFetched> callback, bool debug = false)
         {
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.GetAllDatabasesAsync(callback, debug);
+                    return await MySQL.MySQL.GetAllDatabasesAsync(callback, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.GetAllDatabasesAsync(callback, debug);
+                    return await SQLite.SQLite.GetAllDatabasesAsync(callback, debug);
             }
-            return new List<Dictionary<string, object>>();
+            return new SQLReturnFetched(new List<Dictionary<string, object>>());
         }
 
         public bool DatabaseExists(string database, bool debug = false)
@@ -180,9 +177,9 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.DatabaseExists(database, debug);
+                    return MySQL.MySQL.DatabaseExists(database, debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.DatabaseExists(database, debug);
+                    return SQLite.SQLite.DatabaseExists(database, debug);
             }
             return false;
         }
@@ -192,35 +189,35 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.DatabaseExistsAsync(database, callback, debug);
+                    return await MySQL.MySQL.DatabaseExistsAsync(database, callback, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.DatabaseExistsAsync(database, callback, debug);
+                    return await SQLite.SQLite.DatabaseExistsAsync(database, callback, debug);
             }
             return false;
         }
 
-        public List<Dictionary<string, object>> GetAllTables(string database, bool debug = false)
+        public SQLReturnFetched GetAllTables(string database, bool debug = false)
         {
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.GetAllTables(database, debug);
+                    return MySQL.MySQL.GetAllTables(database, debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.GetAllTables(database, debug);
+                    return SQLite.SQLite.GetAllTables(database, debug);
             }
-            return new List<Dictionary<string, object>>();
+            return new SQLReturnFetched(new List<Dictionary<string, object>>());
         }
 
-        public async Task<List<Dictionary<string, object>>> GetAllTablesAsync(string database, Action<List<Dictionary<string, object>>> callback, bool debug = false)
+        public async Task<SQLReturnFetched> GetAllTablesAsync(string database, Action<SQLReturnFetched> callback, bool debug = false)
         {
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.GetAllTablesAsync(database, callback, debug);
+                    return await MySQL.MySQL.GetAllTablesAsync(database, callback, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.GetAllTablesAsync(database, callback, debug);
+                    return await SQLite.SQLite.GetAllTablesAsync(database, callback, debug);
             }
-            return new List<Dictionary<string, object>>();
+            return new SQLReturnFetched(new List<Dictionary<string, object>>());
         }
 
         public bool TablesExists(string database, string table, bool debug = false)
@@ -228,9 +225,9 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return MySQL.TablesExists(database, table, debug);
+                    return MySQL.MySQL.TablesExists(database, table, debug);
                 case ESQLTypes.SQLite:
-                    return SQLite.TablesExists(database, table, debug);
+                    return SQLite.SQLite.TablesExists(database, table, debug);
             }
             return false;
         }
@@ -240,12 +237,14 @@ namespace SimpliarSQL.NET.Core
             switch (this.activeType)
             {
                 case ESQLTypes.MySQL:
-                    return await MySQL.TablesExistsAsync(database, table, callback, debug);
+                    return await MySQL.MySQL.TablesExistsAsync(database, table, callback, debug);
                 case ESQLTypes.SQLite:
-                    return await SQLite.TablesExistsAsync(database, table, callback, debug);
+                    return await SQLite.SQLite.TablesExistsAsync(database, table, callback, debug);
             }
             return false;
         }
+
+
 
     }
 }

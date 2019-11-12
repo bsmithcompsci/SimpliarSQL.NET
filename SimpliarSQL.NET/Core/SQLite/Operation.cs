@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
+using SimpliarSQL.NET.Core.Utils;
 
-namespace SimpliarSQL.Core.SQLite
+namespace SimpliarSQL.NET.Core.SQLite
 {
     public abstract class Operation<TResult>
     {
@@ -13,7 +14,7 @@ namespace SimpliarSQL.Core.SQLite
 
         public Operation(string connectionString) => this.connectionString = connectionString;
 
-        public TResult Execute(string query, List<SQLiteParameter> parameters = null, bool debug = false)
+        public TResult Execute(string query, PreparedList parameters = null, bool debug = false)
         {
             TResult result = default(TResult);
 
@@ -60,7 +61,7 @@ namespace SimpliarSQL.Core.SQLite
 
             return result;
         }
-        public async Task<TResult> ExecuteAsync(string query, Action<TResult> asyncCallback, List<SQLiteParameter> parameters = null, bool debug = false)
+        public async Task<TResult> ExecuteAsync(string query, Action<TResult> asyncCallback, PreparedList parameters = null, bool debug = false)
         {
             TResult result = default(TResult);
 
@@ -113,7 +114,7 @@ namespace SimpliarSQL.Core.SQLite
         abstract protected TResult Reader(SQLiteCommand cmd);
         abstract protected Task<TResult> ReaderAsync(SQLiteCommand cmd);
 
-        private string QueryToString(string query, List<SQLiteParameter> parameters)
+        private string QueryToString(string query, PreparedList parameters)
         {
             //return query + " {" + string.Join(";", parameters.Select(x => x.ParameterName + "=" + x.Value).ToArray() + "}");
             string result = query;
